@@ -42,7 +42,7 @@ const $tool = (() => {
     return { isQuanX, isSurge, notify, setCache, getCache, GET, POST }
 })();
 
-const consoleLog = true;
+const consoleLog = false;
 const imdbApikeyCacheKey = "IMDbApikey";
 const netflixTitleCacheKey = "NetflixTitle";
 
