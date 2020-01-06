@@ -7,7 +7,8 @@ const path2 = "wareBusiness";
 const console_log = false;
 const url = $request.url;
 const body = $response.body;
-const $tool = tool();
+const isSurge = typeof $httpClient != "undefined"
+const isQuanX = typeof $task != "undefined"
 
 if (url.indexOf(path1) != -1) {
     let obj = JSON.parse(body);
@@ -114,15 +115,27 @@ function request_history_price(share_url, callback) {
         },
         body: "methodName=getBiJiaInfo_wxsmall&p_url=" + encodeURIComponent(share_url)
     }
-    $tool.POST(options, function (error, response, data) {
-        if (!error) {
-            callback(JSON.parse(data));
-            if (console_log) console.log("Data:\n" + data);
-        } else {
+    if (isSurge) {
+        $httpClient.post(options, function (error, response, data) {
+            if (!error) {
+                callback(JSON.parse(data));
+                if (console_log) console.log("Data:\n" + data);
+            } else {
+                callback(null, null);
+                if (console_log) console.log("Error:\n" + error);
+            }
+        })
+    }
+    if (isQuanX) {
+        options["method"] = "POST"
+        $task.fetch(options).then(response => {
+            callback(JSON.parse(response.body));
+            if (console_log) console.log("Data:\n" + response.body);
+        }, reason => {
             callback(null, null);
-            if (console_log) console.log("Error:\n" + error);
-        }
-    })
+            if (console_log) console.log("Error:\n" + reason.error);
+        })
+    }
 }
 
 function changeDateFormat(cellval) {
@@ -196,44 +209,4 @@ Date.prototype.format = function (fmt) {
         }
     }
     return fmt;
-}
-
-function tool() {
-    const isSurge = typeof $httpClient != "undefined"
-    const isQuanX = typeof $task != "undefined"
-    const notify = (title, subtitle, message) => {
-        if (isQuanX) $notify(title, subtitle, message)
-        if (isSurge) $notification.post(title, subtitle, message)
-    }
-    const setCache = (value, key) => {
-        if (isQuanX) return $prefs.setValueForKey(value, key)
-        if (isSurge) return $persistentStore.write(value, key)
-    }
-    const getCache = (key) => {
-        if (isQuanX) return $prefs.valueForKey(key)
-        if (isSurge) return $persistentStore.read(key)
-    }
-    const GET = (options, callback) => {
-        if (isQuanX) {
-            if (typeof options == "string") options = { url: options }
-            options["method"] = "GET"
-            $task.fetch(options).then(response => {
-                response["status"] = response.statusCode
-                callback(null, response, response.body)
-            }, reason => callback(reason.error, null, null))
-        }
-        if (isSurge) $httpClient.get(options, callback)
-    }
-    const POST = (options, callback) => {
-        if (isQuanX) {
-            if (typeof options == "string") options = { url: options }
-            options["method"] = "POST"
-            $task.fetch(options).then(response => {
-                response["status"] = response.statusCode
-                callback(null, response, response.body)
-            }, reason => callback(reason.error, null, null))
-        }
-        if (isSurge) $httpClient.post(options, callback)
-    }
-    return { isQuanX, isSurge, notify, setCache, getCache, GET, POST }
 }
