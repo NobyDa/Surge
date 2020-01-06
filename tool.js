@@ -1,12 +1,9 @@
 const $tool = tool()
-console.log($tool.isQuanX)
-console.log($tool.isSurge)
-//通知
+
 $tool.notify("title", "subtitle", "body")
-//缓存
 $tool.setCache("value", "key")
 $tool.getCache("key")
-//请求
+
 $tool.get("http://www.baidu.com", function (error, response, data) {
     console.log(error)
     console.log(response)// response.status response.headers
