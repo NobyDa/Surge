@@ -114,7 +114,7 @@ function request_history_price(share_url, callback) {
         },
         body: "methodName=getBiJiaInfo_wxsmall&p_url=" + encodeURIComponent(share_url)
     }
-    $tool.post(options, function (error, response, data) {
+    $tool.POST(options, function (error, response, data) {
         if (!error) {
             callback(JSON.parse(data));
             if (console_log) console.log("Data:\n" + data);
