@@ -1,4 +1,30 @@
-const $tool = (() => {
+const $tool = tool()
+console.log($tool.isQuanX)
+console.log($tool.isSurge)
+//通知
+$tool.notify("title", "subtitle", "body")
+//缓存
+$tool.setCache("value", "key")
+$tool.getCache("key")
+//请求
+$tool.get("http://www.baidu.com", function (error, response, data) {
+    console.log(error)
+    console.log(response)// response.status response.headers
+    console.log(data)
+})
+
+const request = {
+    url: "https://www.baidu.com",
+    body: "{}"
+    //...
+}
+$tool.post(request, function (error, response, data) {
+    console.log(error)
+    console.log(response)// response.status response.headers
+    console.log(data)
+})
+
+function tool() {
     const isSurge = typeof $httpClient != "undefined"
     const isQuanX = typeof $task != "undefined"
     const notify = (title, subtitle, message) => {
@@ -13,7 +39,7 @@ const $tool = (() => {
         if (isQuanX) return $prefs.valueForKey(key)
         if (isSurge) return $persistentStore.read(key)
     }
-    const GET = (options, callback) => {
+    const get = (options, callback) => {
         if (isQuanX) {
             if (typeof options == "string") options = { url: options }
             options["method"] = "GET"
@@ -24,7 +50,7 @@ const $tool = (() => {
         }
         if (isSurge) $httpClient.get(options, callback)
     }
-    const POST = (options, callback) => {
+    const post = (options, callback) => {
         if (isQuanX) {
             if (typeof options == "string") options = { url: options }
             options["method"] = "POST"
@@ -35,34 +61,10 @@ const $tool = (() => {
         }
         if (isSurge) $httpClient.post(options, callback)
     }
-    return { isQuanX, isSurge, notify, setCache, getCache, GET, POST }
-})();
-
-//通知
-$tool.notify("title", "subtitle", "body")
-//缓存
-$tool.setCache("value", "key")
-$tool.getCache("key")
-//请求
-$tool.GET("http://www.baidu.com", function (error, response, data) {
-    console.log(error)
-    console.log(response)// response.status response.headers
-    console.log(data)
-})
-
-const request = {
-    url: "https://www.baidu.com",
-    body: "{}"
-    //...
+    return { isQuanX, isSurge, notify, setCache, getCache, get, post }
 }
-$tool.POST(request, function (error, response, data) {
-    console.log(error)
-    console.log(response)// response.status response.headers
-    console.log(data)
-})
 
-
-/*const $tool = (() => {
+/*function tool() {
     const isSurge = typeof $httpClient != "undefined"
     const isQuanX = typeof $task != "undefined"
     const notify = (() => {
@@ -107,4 +109,4 @@ $tool.POST(request, function (error, response, data) {
         return { get, post }
     })()
     return { isQuanX, isSurge, notify, cache, request }
-})();*/
+}*/
